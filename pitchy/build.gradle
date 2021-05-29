@@ -1,0 +1,28 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '2.5.0'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'com.lojfacens'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  // spring
+  implementation "org.springframework.boot:spring-boot-starter"
+
+  // annotation processors
+  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+  // test
+  testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+test {
+  useJUnitPlatform()
+}
