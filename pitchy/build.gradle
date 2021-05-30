@@ -12,12 +12,22 @@ repositories {
   mavenCentral()
 }
 
+ext {
+  jdaVersion = '4.2.1_266'
+}
+
 dependencies {
   // spring
   implementation "org.springframework.boot:spring-boot-starter"
+  implementation "org.springframework.boot:spring-boot-configuration-processor"
+  implementation "org.springframework.boot:spring-boot-starter-validation"
+
+  // utils
+  compileOnly 'org.projectlombok:lombok'
 
   // annotation processors
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+  annotationProcessor 'org.projectlombok:lombok'
 
   // test
   testImplementation "org.springframework.boot:spring-boot-starter-test"
@@ -25,4 +35,9 @@ dependencies {
 
 test {
   useJUnitPlatform()
+}
+
+bootJar {
+  // exclude profile with hardcoded sensitive data
+  exclude('application-dev.yaml')
 }

@@ -1,0 +1,4 @@
+bot:
+  config:
+    bot_name: PitchyBot
+    token:    ${BOT_TOKEN:}
