@@ -10,6 +10,7 @@ sourceCompatibility = '11'
 
 repositories {
   mavenCentral()
+  maven { url 'https://jitpack.io' }
   maven {
     name 'm2-dv8tion'
     url 'https://m2.dv8tion.net/releases'
@@ -17,12 +18,18 @@ repositories {
 }
 
 ext {
-  jdaVersion = '4.2.1_266'
+  jdaVersion         = '4.2.1_266'
+  lavalinkCleintVersion = '4.0'
+  reflectionsVersion = '0.9.12'
 }
 
 dependencies {
   // discord
   implementation "net.dv8tion:JDA:${jdaVersion}"
+
+  // music
+  implementation "com.github.freyacodes:Lavalink-Client:4.0"
+  implementation "com.sedmelluq:lavaplayer-ext-youtube-rotator:0.2.3"
 
   // spring
   implementation "org.springframework.boot:spring-boot-starter"
@@ -30,12 +37,13 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   // utils
-  implementation 'com.mashape.unirest:unirest-java:1.4.9'
-  compileOnly 'org.projectlombok:lombok'
+  implementation "com.mashape.unirest:unirest-java:1.4.9"
+  implementation "org.reflections:reflections:${reflectionsVersion}"
+  compileOnly "org.projectlombok:lombok"
 
   // annotation processors
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.projectlombok:lombok"
 
   // test
   testImplementation "org.springframework.boot:spring-boot-starter-test"
