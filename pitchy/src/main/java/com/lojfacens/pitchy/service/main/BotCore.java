@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 
 import com.lojfacens.pitchy.config.BotConfig;
 import com.lojfacens.pitchy.entity.Shard;
+import com.lojfacens.pitchy.event.listener.MessageListener;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class BotCore {
 
   private final BotConfig botConfig;
   private final BotManager botManager;
+
+  private final MessageListener messageListener;
 
   @PostConstruct
   private void startUp() {
@@ -61,7 +64,10 @@ public class BotCore {
       var shardManagerBuilder = DefaultShardManagerBuilder.create(token, Arrays.asList(intentsToEnable))
       .disableCache(Arrays.asList(flagsToDisable))
       .setShardsTotal(shardsTotal)
-      .addEventListeners(shardStartListener)
+      .addEventListeners(
+          shardStartListener,
+          messageListener
+      )
       .addEventListenerProvider(id -> getShard(id).getListener());
 
       log.info("Initializing {} shards...", shardsTotal);
