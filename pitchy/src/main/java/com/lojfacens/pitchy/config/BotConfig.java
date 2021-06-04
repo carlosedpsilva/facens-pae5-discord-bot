@@ -20,8 +20,12 @@ public class BotConfig {
   @Size(min = 2, max = 32, message = "Bot name must be between 2 and 32 characters long")
   private String botName;
 
+  private String clientId;
+
   @NotNull(message = "Bot token may not be null")
   @Pattern(regexp = "^[A-Za-z\\d]{24}\\.[\\w-]{6}\\.[\\w-]{27}$", message = "The provided token is not valid")
   private String token;
+
+  private String[] prefixes;
 
 }

@@ -17,7 +17,9 @@ repositories {
 }
 
 ext {
-  jdaVersion = '4.2.1_266'
+  jdaVersion         = '4.2.1_266'
+  unirestVersion     = '1.4.9'
+  reflectionsVersion = '0.9.12'
 }
 
 dependencies {
@@ -30,12 +32,13 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   // utils
-  implementation 'com.mashape.unirest:unirest-java:1.4.9'
-  compileOnly 'org.projectlombok:lombok'
+  implementation "com.mashape.unirest:unirest-java:${unirestVersion}"
+  implementation "org.reflections:reflections:${reflectionsVersion}"
+  compileOnly "org.projectlombok:lombok"
 
   // annotation processors
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.projectlombok:lombok"
 
   // test
   testImplementation "org.springframework.boot:spring-boot-starter-test"

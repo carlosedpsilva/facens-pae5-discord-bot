@@ -11,6 +11,7 @@ import javax.security.auth.login.LoginException;
 import com.lojfacens.pitchy.config.BotConfig;
 import com.lojfacens.pitchy.entity.Shard;
 import com.lojfacens.pitchy.event.listener.MessageListener;
+import com.lojfacens.pitchy.service.command.CommandProcessor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ public class BotCore {
 
   private final BotConfig botConfig;
   private final BotManager botManager;
+
+  private final CommandProcessor commandProcessor;
 
   private final MessageListener messageListener;
 
@@ -73,7 +76,9 @@ public class BotCore {
       log.info("Initializing {} shards...", shardsTotal);
       var start = System.currentTimeMillis();
       botManager.setShardManager(shardManagerBuilder.build());
-      countdownShards(start, shardStartListener);
+
+      new Thread(() -> countdownShards(start, shardStartListener)).start();
+      commandProcessor.setupCommands();
 
     } catch (LoginException e) {
       log.error("Login operation failed");
