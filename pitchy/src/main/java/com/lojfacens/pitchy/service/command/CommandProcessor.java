@@ -1,6 +1,7 @@
 package com.lojfacens.pitchy.service.command;
 
-import java.awt.Color;
+import static com.lojfacens.pitchy.util.DisUtils.TITLE_EXCEPTION;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -12,12 +13,12 @@ import java.util.stream.Stream;
 import com.lojfacens.pitchy.service.command.meta.Command;
 import com.lojfacens.pitchy.service.command.meta.CommandContext;
 import com.lojfacens.pitchy.service.command.meta.CommandModule;
+import com.lojfacens.pitchy.util.DisUtils;
 
 import org.reflections.Reflections;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -54,6 +55,7 @@ public class CommandProcessor {
     var command = context.getCommand();
     if (command == null
         || !isEnabled(command, context)
+        || !isValidAudio(command, context)
         || !hasPermission(command, context))
       return;
     command.onCommand(context);
@@ -61,13 +63,10 @@ public class CommandProcessor {
 
   private boolean isEnabled(Command command, CommandContext context) {
     if (!command.isEnabled()) {
-      var embed = new EmbedBuilder()
-          .setColor(Color.decode("#e35f8d"))
-          .setTitle("❌ Oops")
-          .setDescription("This command is disabled.")
-          .setFooter("🍑 Pitchy")
-          .build();
-      context.getMessage().reply(embed).queue(s -> {}, f -> context.getChannel().sendMessage(embed).queue());
+      var embedResponse = DisUtils.responseEmbedBuilder()
+          .setTitle(TITLE_EXCEPTION)
+          .setDescription("This command is disabled.");
+      context.reply(embedResponse.build());
       return false;
     }
     return true;
@@ -87,18 +86,44 @@ public class CommandProcessor {
         if (member.hasPermission(command.getPermissions()) && !member.hasPermission(channel, command.getPermissions())
             || !member.hasPermission(command.getPermissions()) && !member.hasPermission(channel, command.getPermissions())) {
           var memberMention = member.getUser().getAsMention() + (member.equals(commander) ? ", you lack" : " lacks");
-          var embed = new EmbedBuilder()
-              .setColor(Color.decode("#e35f8d"))
-              .setTitle("❌ Oops")
+          var embedResponse = DisUtils.responseEmbedBuilder()
+              .setTitle(TITLE_EXCEPTION)
               .setDescription(memberMention + " the following permissions to use this command:\n\n"
-                  + command.getPermissions().stream().map(p -> "`" + p.getName() + "`").collect(Collectors.joining(", ")))
-              .setFooter("🍑 Pitchy")
-              .build();
-          context.getMessage().reply(embed).queue(s -> {}, f -> context.getChannel().sendMessage(embed).queue());
+                  + command.getPermissions().stream().map(p -> "`" + p.getName() + "`").collect(Collectors.joining(", ")));
+          context.reply(embedResponse.build());
           return false;
         }
       }
     }
+    return true;
+  }
+
+  private boolean isValidAudio(Command command, CommandContext context) {
+    if (!command.getModule().getName().equals("audio"))
+      return true;
+
+    var embedResponse = DisUtils.responseEmbedBuilder().setTitle(TITLE_EXCEPTION);
+
+    if (!context.getMember().getVoiceState().inVoiceChannel()) {
+      embedResponse.setDescription("You must be connected to a voice channel");
+      context.reply(embedResponse.build());
+      return false;
+    }
+
+    if (context.getAudioManager().hasLink(context.getGuild())
+        && !context.getAudioManager().isLinkConnected(context.getGuild())
+        && Stream.of("play").noneMatch(s -> s.equals(command.getName()))) {
+      embedResponse.setDescription("No audio connection");
+      context.reply(embedResponse.build());
+      return false;
+    }
+
+    if (context.getAudioManager().getLavalinkManager().getLavalink().getNodes().isEmpty()) {
+      embedResponse.setDescription("No lavalink");
+      context.reply(embedResponse.build());
+      return false;
+    }
+
     return true;
   }
 
