@@ -1,13 +1,12 @@
 package com.lojfacens.pitchy.module.developer.command;
 
-import java.awt.Color;
+import static com.lojfacens.pitchy.util.DisUtils.responseEmbedBuilder;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import com.lojfacens.pitchy.service.command.meta.Command;
 import com.lojfacens.pitchy.service.command.meta.CommandContext;
-
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ArgsCommand extends Command {
 
@@ -29,21 +28,16 @@ public class ArgsCommand extends Command {
         + e.getValue().stream().map(s -> "`" + s + "`").collect(Collectors.joining(", "))
     ).collect(Collectors.joining("\n"));
 
-    var embed = new EmbedBuilder()
-        .setColor(Color.decode("#e35f8d"))
+    var embedResponse = responseEmbedBuilder()
         .setTitle("Args Command")
         .setDescription("Command to test argument splitting")
         .addField("Command", commandName, false)
         .addField("Arguments", arguments, false)
         .addField("Options",     options, false)
-        .addField(
-          "Normalized Arguments (to 3 args)",
-          String.format("`Normalized` = %s%n`Remaining` = `%s`", normalizedArgs, fullNormalized[3]),
-          false)
-        .setFooter("🍑 Pitchy")
-        .build();
-
-    context.reply(embed);
+        .addField("Normalized Arguments (to 3 args)", String.format(
+            "`Normalized` = %s%n`Remaining` = `%s`", normalizedArgs, fullNormalized[3]),
+            false);
+    context.reply(embedResponse.build());
   }
 
 }
