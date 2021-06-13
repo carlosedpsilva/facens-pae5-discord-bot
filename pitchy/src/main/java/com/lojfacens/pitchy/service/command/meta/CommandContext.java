@@ -3,6 +3,7 @@ package com.lojfacens.pitchy.service.command.meta;
 import java.util.List;
 import java.util.Map;
 
+import com.lojfacens.pitchy.service.audio.AudioManager;
 import com.lojfacens.pitchy.service.main.BotManager;
 import com.lojfacens.pitchy.util.StringUtils;
 
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class CommandContext {
 
   private final BotManager botManager;
+  private final AudioManager audioManager;
   private final GuildMessageReceivedEvent event;
   private final Command command;
   private final String content;

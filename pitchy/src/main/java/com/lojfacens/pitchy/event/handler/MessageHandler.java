@@ -1,6 +1,7 @@
 package com.lojfacens.pitchy.event.handler;
 
 import com.lojfacens.pitchy.config.BotConfig;
+import com.lojfacens.pitchy.service.audio.AudioManager;
 import com.lojfacens.pitchy.service.command.CommandProcessor;
 import com.lojfacens.pitchy.service.command.meta.Command;
 import com.lojfacens.pitchy.service.command.meta.CommandContext;
@@ -18,6 +19,7 @@ public class MessageHandler {
 
   private final BotConfig botConfig;
   private final BotManager botManager;
+  private final AudioManager audioManager;
   private final CommandProcessor commandProcessor;
 
   public void handleMessage(GuildMessageReceivedEvent event) {
@@ -70,6 +72,7 @@ public class MessageHandler {
 
     return CommandContext.builder()
         .botManager(botManager)
+        .audioManager(audioManager)
         .event(event)
         .command(command)
         .content(content)

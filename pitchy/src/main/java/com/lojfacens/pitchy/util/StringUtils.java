@@ -2,7 +2,7 @@ package com.lojfacens.pitchy.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public class StringUtils {
 
   public static final Pattern SPLIT_PATTERN = Pattern.compile("\\s+");
+  public static final Pattern URL_PATTERN = Pattern.compile("^<https?:\\/\\/.*>$.*|^https?:\\/\\/.*[^>]$");
+
   public static final String[] EMPTY_ARRAY = new String[0];
 
   private StringUtils() { }
@@ -108,7 +110,7 @@ public class StringUtils {
    *
    * @param raw          the {@link String}[] array to be normalized
    * @param expectedArgs the final size of the Array
-   * @return             @{link String}[] with the size of expectedArgs + 1
+   * @return             {@link String}[] with the size of expectedArgs + 1
    */
   public static String[] normalizeArray(String[] raw, int expectedArgs) {
     var normalized = new String[expectedArgs + 1];
@@ -127,6 +129,14 @@ public class StringUtils {
     return normalized;
   }
 
+  public static String[] normalizeArray(List<String> raw, int expectedArgs) {
+    return normalizeArray(raw.toArray(new String[0]), expectedArgs);
+  }
+
+  public static List<String> normalizeList(List<String> raw, int expectedArgs) {
+    return Arrays.asList(normalizeArray(raw.toArray(new String[0]), expectedArgs));
+  }
+
   /**
    * Parses arguments to a {@link Map} with Strings which starts with {@code -},
    * {@code --} or {@code /} as keys and the following arguments which does not as
@@ -136,21 +146,21 @@ public class StringUtils {
    * @return     a {@link Map} with options as keys and parameters as values
    */
   public static Map<String, List<String>> parseArguments(String[] args) {
-    var options = new HashMap<String, List<String>>();
+    var options = new LinkedHashMap<String, List<String>>();
     var optArgs = new ArrayList<String>();
     var currentOption = "default";
     for (var i = 0; i < args.length; i++) {
       if (args[i].charAt(0) == '-' || args[i].charAt(0) == '/') {     // Check whether this arg is an option
         args[i] = args[i].substring(1);                               // Remove first dash or slash
         if (args[i].charAt(0) == '-') args[i] = args[i].substring(1); // Remove second dash
-        currentOption = args[i];                                      // Update current option
+        currentOption = args[i].toLowerCase();                        // Update current option
       } else optArgs.add(args[i]);                                    // Add current arg to list if it isnt an option
       // Add following arguments to list while next arg isnt an option
       while (i + 1 < args.length && args[i + 1].charAt(0) != '-' && args[i + 1].charAt(0) != '/') {
         i++;
         optArgs.add(args[i]);
       }
-      options.put(currentOption, optArgs);
+      options.putIfAbsent(currentOption, optArgs);
       optArgs = new ArrayList<>();
     }
     return options;
@@ -183,6 +193,23 @@ public class StringUtils {
               .replace("\\t", "\t")
               .replace("\\\"", "\"")
               .replace("\\\\", "\\");
+  }
+
+  /**
+   * Formats milliseconds into timestamp
+   *
+   * @param milliseconds the duration to be formatted
+   * @return formatted timeStamp.
+   */
+  public static String getTimestamp(long milliseconds) {
+    int seconds = (int) (milliseconds / 1000) % 60;
+    int minutes = (int) (milliseconds / (1000 * 60)) % 60;
+    int hours   = (int) (milliseconds / (1000 * 60 * 60)) % 24;
+    int days    = (int) (milliseconds / (1000 * 60 * 60 * 24));
+
+    if (days > 0) return String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
+    else if (hours > 0) return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    else return String.format("%02d:%02d", minutes, seconds);
   }
 
 }
