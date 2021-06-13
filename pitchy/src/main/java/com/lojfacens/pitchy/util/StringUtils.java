@@ -212,4 +212,16 @@ public class StringUtils {
     else return String.format("%02d:%02d", minutes, seconds);
   }
 
+  public static String getFirstMatch(String[] args, String regex) {
+    return getFirstMatch(Arrays.asList(args), regex);
+  }
+
+  public static String getFirstMatch(List<String> args, String regex) {
+    var pattern = Pattern.compile(regex);
+    for (var arg : args)
+      if (pattern.matcher(arg).matches())
+        return arg;
+    return null;
+  }
+
 }
