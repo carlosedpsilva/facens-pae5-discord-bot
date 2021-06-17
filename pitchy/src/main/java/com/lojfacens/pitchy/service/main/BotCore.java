@@ -11,6 +11,8 @@ import javax.security.auth.login.LoginException;
 import com.lojfacens.pitchy.config.BotConfig;
 import com.lojfacens.pitchy.entity.Shard;
 import com.lojfacens.pitchy.event.listener.MessageListener;
+import com.lojfacens.pitchy.event.listener.VoiceChannelListener;
+import com.lojfacens.pitchy.service.audio.AudioManager;
 import com.lojfacens.pitchy.service.command.CommandProcessor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +35,21 @@ public class BotCore {
 
   private final BotConfig botConfig;
   private final BotManager botManager;
+  private final AudioManager audioManager;
 
   private final CommandProcessor commandProcessor;
 
   private final MessageListener messageListener;
+  private final VoiceChannelListener voiceChannelListener;
 
   @PostConstruct
   private void startUp() {
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      if (botManager.getShardManager() != null) botManager.getShardManager().shutdown();
+      if (botManager.getShardManager() != null) {
+        audioManager.getGuildAudioManagers().values().forEach(g -> g.getLink().destroy());
+        botManager.getShardManager().shutdown();
+      }
     }));
 
     var token = botConfig.getToken();
@@ -68,9 +75,9 @@ public class BotCore {
       .disableCache(Arrays.asList(flagsToDisable))
       .setShardsTotal(shardsTotal)
       .addEventListeners(
-          shardStartListener,
-          messageListener
+          shardStartListener, messageListener, voiceChannelListener, audioManager.getLavalinkManager().getLavalink()
       )
+      .setVoiceDispatchInterceptor(audioManager.getLavalinkManager().getLavalink().getVoiceInterceptor())
       .addEventListenerProvider(id -> getShard(id).getListener());
 
       log.info("Initializing {} shards...", shardsTotal);

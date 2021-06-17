@@ -6,25 +6,32 @@ plugins {
 
 group = 'com.lojfacens'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '16'
 
 repositories {
   mavenCentral()
-  maven {
-    name 'm2-dv8tion'
-    url 'https://m2.dv8tion.net/releases'
-  }
+  maven { url 'https://m2.dv8tion.net/releases' }
+  maven { url 'https://jitpack.io' }
 }
 
 ext {
-  jdaVersion         = '4.2.1_266'
-  unirestVersion     = '1.4.9'
-  reflectionsVersion = '0.9.12'
+  jdaVersion            = '4.2.1_266'
+  lavalinkVersion       = '3ea4125'
+  lavaplayerVersion     = '8b65f55'
+  youtubeRotatorVersion = '0.2.3'
+  unirestVersion        = '1.4.9'
+  reflectionsVersion    = '0.9.12'
 }
 
 dependencies {
   // discord
   implementation "net.dv8tion:JDA:${jdaVersion}"
+
+  // music
+  implementation ("com.github.freyacodes:Lavalink-Client:${lavalinkVersion}") {
+    exclude group: "com.sedmelluq", module: "lavaplayer" }
+  implementation "com.github.sedmelluq:lavaplayer:${lavaplayerVersion}"
+  implementation "com.sedmelluq:lavaplayer-ext-youtube-rotator:${youtubeRotatorVersion}"
 
   // spring
   implementation "org.springframework.boot:spring-boot-starter"
